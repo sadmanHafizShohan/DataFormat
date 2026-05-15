@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Converter and Downloader</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #667eea;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .box {
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .box:nth-child(1) {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .box:nth-child(2) {
+            background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);
+        }
+
+        #draftData {
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e59c 100%);
+        }
+
+        .box label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #ffffff;
+            font-size: 16px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #inputCounter, #outputCounter, #draftCounter {
+            font-size: 13px !important;
+            color: #ffffff !important;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        textarea {
+            width: 100%;
+            height: 350px;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            font-size: 15px;
+            resize: vertical;
+            line-height: 1.6;
+            background: rgba(255, 255, 255, 0.95);
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.4);
+            background: #ffffff;
+        }
+
+        textarea::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        #fileUpload {
+            padding: 10px 15px;
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            color: #333;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        #fileUpload:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        #fileUpload::file-selector-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        #fileUpload::file-selector-button:hover {
+            transform: scale(1.05);
+        }
+
+        small {
+            color: #ffffff !important;
+            display: block !important;
+            margin-top: 8px !important;
+            font-size: 12px !important;
+            font-weight: 500;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        button {
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-convert {
+            background: linear-gradient(135deg, #00b894 0%, #00d2d3 100%);
+        }
+
+        .btn-convert:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 184, 148, 0.4);
+        }
+
+        .btn-convert:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-download:active {
+            transform: translateY(-1px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 25px;
+            }
+
+            h2 {
+                font-size: 24px;
+                margin-bottom: 25px;
+            }
+
+            textarea {
+                height: 250px;
+            }
+
+            button {
+                padding: 12px 24px;
+                font-size: 14px;
+            }
+
+            .buttons {
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Data Converter</h2>
+        
+        <div class="grid">
+            <div class="box">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label for="inputData">এখানে ডেটা পেস্ট করুন (Input):</label>
+                    <span id="inputCounter" style="font-size: 12px; color: #666;">লাইন: 0</span>
+                </div>
+                <textarea id="inputData" placeholder="আপনার ডেটা এখানে পেস্ট করুন..." oninput="updateCounter('inputCounter', 'inputData'); convertData();"></textarea>
+                <div style="margin-top: 10px;">
+                    <input type="file" id="fileUpload" accept=".txt" style="padding: 8px; cursor: pointer;" onchange="handleFileUpload()">
+                    <small style="color: #888; display: block; margin-top: 5px;">অথবা এখানে .txt ফাইল আপলোড করুন</small>
+                </div>
+            </div>
+            <div class="box">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label for="outputData">ফলাফল (Output):</label>
+                    <span id="outputCounter" style="font-size: 12px; color: #666;">লাইন: 0</span>
+                </div>
+                <textarea id="outputData" placeholder="কনভার্ট হওয়ার পর ডেটা এখানে আসবে..." readonly></textarea>
+            </div>
+        </div>
+        <div class="grid">
+            <div class="box">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label for="draftData">খসড়া কমেন্ট (Draft Comments):</label>
+                    <span id="draftCounter" style="font-size: 12px; color: #666;">লাইন: 0</span>
+                </div>
+                <textarea id="draftData" placeholder="খসড়া কমেন্ট এখানে দেখাবে..." readonly></textarea>
+            </div>
+        </div>
+        <div class="buttons">
+            <button class="btn-convert" onclick="convertData()">Convert Data</button>
+            <button class="btn-download" onclick="downloadTXT()">Download Matched Comment</button>
+            <button class="btn-download" onclick="downloadDraftComments()" style="background-color: #ff9800;">Download Other Or Empty Comments</button>
+        </div>
+    </div>
+
+    <script>
+        const pinnedComments = [
+            "নাম সংশোধন করা হলো",
+            "মালিকানার অংশের পরিমান সংশোধন করা হল",
+            "জমির পরিমান সংশোধন করা হল",
+            "ঠিকানা সংশোধন করা হল",
+            "দাগ নাম্বার সংশোধন করা হল",
+            "নাম ও দাগ সংশোধন করা হল",
+            "নাম ও জমির পরিমান সংশোধন করা হল",
+            "দাগ ও জমির পরিমান সংশোধন করা হল",
+            "নাম ও মালিকানা অংশের পরিমান সংশোধন করা হল",
+            "ভূমি জরিপের ধরন/মালিকানা সূত্র সংশোধন করা হল",
+            "সর্বশেষ কর পরিশোধের সাল/ শুরুর সাল করা হল",
+            "আগত খতিয়ান নং সংশোধন করা হল",
+            "মামলা নম্বর সংশোধন করা হল",
+            "আগত খতিয়ান নং ও নামজারি মামলা নম্বর সংশোধন করা হল",
+            "দাগের মোট জমির পরিমান সংশোধন করা হল",
+            "জমির শ্রেনী সংশোধন করা হল"
+        ];
+    
+        // pinnedComments কে normalize করি (trim করা)
+        const normalizedPinnedComments = pinnedComments.map(c => c.trim());
+        
+        function updateCounter(counterId, textareaId) {
+            const textarea = document.getElementById(textareaId);
+            const counter = document.getElementById(counterId);
+            const lines = textarea.value.trim() === '' ? 0 : textarea.value.split('\n').length;
+            counter.textContent = 'লাইন: ' + lines;
+        }
+
+        function handleFileUpload() {
+            const fileInput = document.getElementById('fileUpload');
+            const file = fileInput.files[0];
+            
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('inputData').value = e.target.result;
+                updateCounter('inputCounter', 'inputData');
+                convertData();
+            };
+            reader.readAsText(file);
+        }
+    
+        function convertData() {
+            const input = document.getElementById('inputData').value;
+            const lines = input.split('\n');
+            let result = [];
+
+            lines.forEach(line => {
+                // ফাঁকা লাইন স্কিপ করার জন্য
+                if (line.trim() === '') return;
+
+                // Tab (\t) দিয়ে কলাম আলাদা করা
+                let columns = line.split('\t');
+
+                // যদি কোন কারণে ট্যাব এর বদলে স্পেস দিয়ে পেস্ট হয়, সেটার জন্য ব্যাকআপ
+                if (columns.length < 4) {
+                    columns = line.split(/ {2,}|\t/);
+                }
+
+                // যদি ৪টি কলাম থাকে তবে ৩য় কলাম (index 2) বাদ দিয়ে বাকিগুলো কমা দিয়ে যুক্ত করা
+                if (columns.length >= 4) {
+                    let col1 = columns[0].trim();
+                    let col2 = columns[1].trim();
+                    let col4 = columns[3].trim(); // ৪র্থ কলাম - display এর জন্য trim করি
+                    
+                    result.push(`${col1},${col2},${col4}`);
+                } else {
+                    // ডেটা ফরম্যাট ঠিক না থাকলে যেমন আছে তেমন রেখে দিবে
+                    result.push(line);
+                }
+            });
+
+            // আউটপুট বক্সে প্রিন্ট করা
+            document.getElementById('outputData').value = result.join('\n');
+
+            // পিন করা এবং খসড়া কমেন্ট আলাদা করা
+            const pinnedCommentLines = [];
+            const draftComments = [];
+
+            result.forEach(line => {
+                const trimmedLine = line.trim();
+                if (trimmedLine === '') return;
+                
+                // লাইন থেকে কমা দিয়ে আলাদা করে কমেন্ট বের করা (শেষ কলাম)
+                const parts = trimmedLine.split(',');
+                if (parts.length >= 3) {
+                    const comment = parts[parts.length - 1].trim(); // শেষ কলাম - সঠিক comparison এর জন্য trim করি
+                    
+                    // যদি এই কমেন্ট normalized pinned comments এ থাকে তবে pinnedCommentLines এ যোগ করা
+                    if (normalizedPinnedComments.includes(comment)) {
+                        pinnedCommentLines.push(line);
+                    } else {
+                        // অন্যথায় draft comments এ যোগ করা
+                        draftComments.push(line);
+                    }
+                }
+            });
+
+            // পিন করা কমেন্ট আউটপুট বক্সে দেখানো
+            document.getElementById('outputData').value = pinnedCommentLines.join('\n');
+
+            // খসড়া কমেন্ট বক্সে দেখানো
+            document.getElementById('draftData').value = draftComments.join('\n');
+
+            // Counter আপডেট করা
+            updateCounter('outputCounter', 'outputData');
+            updateCounter('draftCounter', 'draftData');
+        }
+
+        function downloadTXT() {
+            const outputText = document.getElementById('outputData').value;
+            
+            if (outputText.trim() === '') {
+                alert("ডাউনলোড করার মতো কোনো ডেটা নেই! আগে Convert Data বাটনে ক্লিক করুন।");
+                return;
+            }
+
+            // টেক্সট থেকে Blob তৈরি করে ফাইল জেনারেট করা
+            const blob = new Blob([outputText], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Match Original Comments.txt'; // ফাইলের নাম
+            document.body.appendChild(a);
+            a.click();
+            
+            // ক্লিক হওয়ার পর মেমরি ক্লিন করা
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+        function downloadDraftComments() {
+            const draftText = document.getElementById('draftData').value;
+            
+            if (draftText.trim() === '') {
+                alert("খসড়া কমেন্ট নেই! সব কমেন্ট পিন করা আছে অথবা কোনো অন্য কমেন্ট নেই।");
+                return;
+            }
+
+            // খসড়া কমেন্ট ফাইল হিসেবে ডাউনলোড করা
+            const blob = new Blob([draftText], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Others Or Empty_comments.txt'; // খসড়া ফাইলের নাম
+            document.body.appendChild(a);
+            a.click();
+            
+            // ক্লিক হওয়ার পর মেমরি ক্লিন করা
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+
+        // Page load এর সময় counter initialize করা
+        window.addEventListener('load', function() {
+            updateCounter('inputCounter', 'inputData');
+            updateCounter('outputCounter', 'outputData');
+            updateCounter('draftCounter', 'draftData');
+        });
+    </script>
+
+</body>
+</html>
